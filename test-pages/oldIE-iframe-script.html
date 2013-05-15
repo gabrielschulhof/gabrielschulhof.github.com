@@ -10,12 +10,12 @@
 							'<meta charset="utf-8">' +
 							'<title>Demo</title>' +
 							'<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script' + '>' +
-							'<script id="replace">window.inlineScriptText = "alert( !!window.jQuery );"</script' + '>' +
+							'<script>alert( !!window.jQuery );</script' + '>' +
 						'</head>' +
 						'<body>' +
-							'<script id="remove" src=' + "'" + 'data:text/javascript,var x = window.inlineScriptText;$( "#replace" ).text( x ).removeAttr( "id" );$( "#remove" ).remove();eval( x );' + "'" + '></script' + '>' +
 						'</body>' +
 					'</html>';
+					alert( data );
             window.frames["code_result"].document.open();
             window.frames["code_result"].document.write(data);
             window.frames["code_result"].document.close();
