@@ -9,12 +9,22 @@
   <link rel="stylesheet"  href="http://code.jquery.com/mobile/latest/jquery.mobile.min.css" />
   <script src="http://code.jquery.com/jquery-git.js"></script>
   <script src="http://code.jquery.com/mobile/latest/jquery.mobile.min.js"></script>
+	<script>
+( function( $, undefined ) {
+	$.mobile.document.on( "click", "a", function( e ) {
+		$( "iframe" ).attr( "src", $( "input" ).val() );
+	});
+})( jQuery );
+	</script>
 </head>
 
 <body>
 <div data-role="page" id="page1">
 	<p>This is the outer frame.</p>
-	<iframe width="300" height="200" style="border: 1px solid black;" src="5972-iframe.html"></iframe>
+	<input data-inline="true" value="5972-iframe.html"></input>
+	<p><a href="#">Set as frame URL</a></p>
+	<iframe width="300" height="200" style="border: 1px solid black;"></iframe>
+	<p>You can test whether the nav will jump back to a previous Web site by setting an external Web site (like, for instance, http://slashdot.org/) as the frame URL and then setting 5972-iframe.html as the frame URL.</p>
 </div><!-- /page -->
 </body>
 </html>
