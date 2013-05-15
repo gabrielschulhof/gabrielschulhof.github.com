@@ -6,12 +6,10 @@
   <meta charset=utf-8 />
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet"  href="http://code.jquery.com/mobile/latest/jquery.mobile.min.css" />
   <script src="http://code.jquery.com/jquery-git.js"></script>
-  <script src="http://code.jquery.com/mobile/latest/jquery.mobile.min.js"></script>
 	<script>
 ( function( $, undefined ) {
-	$.mobile.document.on( "click", "a", function( e ) {
+	$( document ).on( "click", "a", function( e ) {
 		$( "iframe" ).attr( "src", $( "input" ).val() );
 	});
 })( jQuery );
