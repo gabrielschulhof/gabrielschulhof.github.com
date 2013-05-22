@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Issue 6025</title>
+  
+<script type='text/javascript'>//<![CDATA[ 
+window.onload=function(){
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+}//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <div id="fb-root"></div>
+
+Right mouse click over this text, choose "Refresh iframe", then try to choose some options<br />
+<iframe style="width:800px;height:400px;" src="6025-iframe.html"></iframe>
+  <div class="fb-like" data-href="https://www.facebook.com/pages/jQuery/8936834181?fref=hf" data-send="true" data-width="450" data-show-faces="true" data-action="recommend"></div>
+
+  
+</body>
+
+
+</html>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+	<title>Issue 6025 - select</title>
+	<link rel="stylesheet" href="../jqm/css/themes/default/jquery.mobile.css" />
+	<script src="../jqm/js/jquery.js"></script>
+	<script src="../jqm/js/"></script>
+</head>
+<body>
+	<p><a data-role="button" data-rel="popup" data-history="false" data-inline="true" href="#thePopup">Pop</a></p>
+	<div data-role="popup" id="thePopup">
+		<p>Hi! I'm a popup</p>
+	</div>
+  <form>
+    <div data-role="fieldcontain">
+      <label for="select-custom-1">Basic:</label>
+      <select name="select-custom-1" id="select-custom-1" data-native-menu="false">
+        <option value="1">The 1st Option</option>
+        <option value="2">The 2nd Option</option>
+        <option value="3">The 3rd Option</option>
+        <option value="4">The 4th Option</option>
+      </select>
+    </div>
+	</form>
+</body>
+</html>
