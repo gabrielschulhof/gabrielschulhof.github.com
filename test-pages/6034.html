@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+	<title>Issue 6034</title>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/latest/jquery.mobile.css" />
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/mobile/latest/jquery.mobile.js"></script>
+</head>
+<body>
+	<div data-role="page" class="ui-content">
+		<form>
+			<div data-role="popup" id="thePopup" data-tolerance="0">
+				<select id="thePopupSelect">
+					<option value="option1">Option 1</option>
+					<option value="option2">Option 2</option>
+					<option value="option3">Option 3</option>
+					<option value="option4">Option 4</option>
+				</select>
+			</div>
+			<select id="theBodySelect" data-native-menu="false">
+				<option value="option1">Body Option 1</option>
+				<option value="option2">Body Option 2</option>
+				<option value="option3">Body Option 3</option>
+				<option value="option4">Body Option 4</option>
+			</select>
+			<a href="#thePopup" data-rel="popup" data-position-to="#theBodySelect-button">Pop</a>
+		</form>
+	<div data-role="page">
+</body>
+</html>
