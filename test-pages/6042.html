@@ -6,28 +6,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/latest/jquery.mobile.css" />
 	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script>
+$( window ).one( "navigate.removeAfterLoginIsDone", function( e ) {
+	e.preventDefault();
+	e.stopImmediatePropagation();
+	return false;
+});
+	</script>
 	<script src="http://code.jquery.com/mobile/latest/jquery.mobile.js"></script>
 	<script>
 ( function( $, undefined ) {
-  
+
 var loggedIn = false;
 
 $.mobile.document.on( "pagechange", function( e ) {
 	if ( $.mobile.activePage.attr( "id" ) === "frontPage" && !loggedIn ) {
-		$.mobile.window.one( "navigate.removeAfterPopupCloses", function( e ) {
-			e.preventDefault();
-		});
-		$( "#loginPopup" )
-          .one( "popupafterclose", function() {
-            $.mobile.window.off( "navigate.removeAfterPopupCloses" );
-          })
-          .popup( "open" );
+		$.mobile.changePage( "6042-dialog.html", { role: "dialog", changeHash: false } );
 	}
 });
 
 $.mobile.document.on( "click", "#loginButton", function( e ) {
 	loggedIn = true;
-	$.mobile.changePage( "#frontPage", { changehash: false } );
+	$.mobile.window.off( "navigate.removeAfterLoginIsDone" );
+	$.mobile.changePage( "#frontPage", { changeHash: false } );
 });
 
 })( jQuery );
@@ -40,18 +41,6 @@ $.mobile.document.on( "click", "#loginButton", function( e ) {
 		</div>
 		<div data-role="content">
 			<p>This is the front page of the application. It can only be reached by logging in first.</p>
-			<form data-transition="pop" id="loginPopup" data-role="popup" data-dismissible="false" data-overlay-theme="a" data-history="false">
-				<div data-role="header">
-					<h1>Please log in</h1>
-				</div>
-				<fieldset style="padding: 10px;">
-					<label for="username" class="ui-hidden-accessible">User name:</label>
-					<input name="username" id="username" placeholder="User name"></input>
-					<label for="password" class="ui-hidden-accessible">Password:</label>
-					<input type="password" name="password" id="password" placeholder="password"></input>
-					<a href="#" data-role="button" id="loginButton">Login</a>
-				</fieldset>
-			</form>
 		</div>
 	</div>
 </body>
