@@ -1,6 +1,6 @@
 /*!
 * jQuery Mobile 1.5.0-pre
-* Git HEAD hash: cb9112abb3acf73abc104051ac318647055b189c <> Date: Wed Jul 23 2014 06:33:55 UTC
+* Git HEAD hash: 1c0d7b4d41ab2f7f6f36c07134e50385af787068 <> Date: Wed Jul 23 2014 06:45:40 UTC
 * http://jquerymobile.com
 *
 * Copyright 2010, 2014 jQuery Foundation, Inc. and othercontributors
@@ -9416,7 +9416,7 @@ $.widget( "mobile.flipswitch", $.extend({
 							}, this ),
 						"transition" );
 				}
-				this[ this._isIE8Textarea() ? "_timeout" : "_prepareHeightUpdate" ]();
+				this._prepareHeightUpdate();
 			}
 		},
 
