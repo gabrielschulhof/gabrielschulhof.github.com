@@ -112,6 +112,7 @@ return $.widget( "ui.dialog", {
 		this._createWrapper();
 
 		this.element
+			.detach()
 			.show()
 			.removeAttr( "title" )
 			.addClass( "ui-dialog-content ui-widget-content" )
