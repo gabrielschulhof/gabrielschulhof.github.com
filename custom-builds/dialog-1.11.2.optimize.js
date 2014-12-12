@@ -95,6 +95,7 @@ return $.widget( "ui.dialog", {
 	},
 
 	_create: function() {
+/*
 		this.originalCss = {
 			display: this.element[ 0 ].style.display,
 			width: this.element[ 0 ].style.width,
@@ -108,7 +109,7 @@ return $.widget( "ui.dialog", {
 		};
 		this.originalTitle = this.element.attr( "title" );
 		this.options.title = this.options.title || this.originalTitle;
-
+*/
 		this._createWrapper();
 
 		this.element
