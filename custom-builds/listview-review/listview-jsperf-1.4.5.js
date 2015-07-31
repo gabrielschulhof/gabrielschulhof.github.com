@@ -1,16 +1,57 @@
-// jquery.mobile.ns
-(function( $ ) {
-	$.mobile145 = {};
-})( jQuery );
+/*!
+* jQuery Mobile 1.4.5
+* Git HEAD hash: 3d7eaceff3292058833a110283695ed8cd9f8464 <> Date: Fri Jul 31 2015 21:17:22 UTC
+* http://jquerymobile.com
+*
+* Copyright 2010, 2015 jQuery Foundation, Inc. and othercontributors
+* Released under the MIT license.
+* http://jquery.org/license
+*
+*/
 
-// jquery.ui.widget
+
+(function ( root, doc, factory ) {
+	if ( typeof define === "function" && define.amd ) {
+		// AMD. Register as an anonymous module.
+		define( [ "jquery" ], function ( $ ) {
+			factory( $, root, doc );
+			return $.mobile;
+		});
+	} else {
+		// Browser globals
+		factory( root.jQuery, root, doc );
+	}
+}( this, document, function ( jQuery, window, document, undefined ) {
+(function( $ ) {
+	$.mobile = {};
+}( jQuery ));
+
+/*!
+ * jQuery UI Widget c0ab71056b936627e8a7821f03c044aec6280a40
+ * http://jqueryui.com
+ *
+ * Copyright 2013 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://api.jqueryui.com/jQuery.widget/
+ */
 (function( $, undefined ) {
 
 var uuid = 0,
 	slice = Array.prototype.slice,
 	_cleanData = $.cleanData;
+$.cleanData = function( elems ) {
+	for ( var i = 0, elem; (elem = elems[i]) != null; i++ ) {
+		try {
+			$( elem ).triggerHandler( "remove" );
+		// http://bugs.jquery.com/ticket/8235
+		} catch( e ) {}
+	}
+	_cleanData( elems );
+};
 
-$.widget145 = function( name, base, prototype ) {
+$.widget = function( name, base, prototype ) {
 	var fullName, existingConstructor, constructor, basePrototype,
 		// proxiedPrototype allows the provided prototype to remain unmodified
 		// so that it can be used as a mixin for multiple widgets (#8876)
@@ -22,7 +63,7 @@ $.widget145 = function( name, base, prototype ) {
 
 	if ( !prototype ) {
 		prototype = base;
-		base = $.Widget145;
+		base = $.Widget;
 	}
 
 	// create selector for plugin
@@ -59,7 +100,7 @@ $.widget145 = function( name, base, prototype ) {
 	// we need to make the options hash a property directly on the new instance
 	// otherwise we'll modify the options hash on the prototype that we're
 	// inheriting from
-	basePrototype.options = $.widget145.extend( {}, basePrototype.options );
+	basePrototype.options = $.widget.extend( {}, basePrototype.options );
 	$.each( prototype, function( prop, value ) {
 		if ( !$.isFunction( value ) ) {
 			proxiedPrototype[ prop ] = value;
@@ -89,7 +130,7 @@ $.widget145 = function( name, base, prototype ) {
 			};
 		})();
 	});
-	constructor.prototype = $.widget145.extend( basePrototype, {
+	constructor.prototype = $.widget.extend( basePrototype, {
 		// TODO: remove support for widgetEventPrefix
 		// always use the name + a colon as the prefix, e.g., draggable:start
 		// don't prefix for widgets that aren't DOM-based
@@ -111,7 +152,7 @@ $.widget145 = function( name, base, prototype ) {
 
 			// redefine the child widget using the same prototype that was
 			// originally used, but inherit from the new version of the base
-			$.widget145( childPrototype.namespace + "." + childPrototype.widgetName, constructor, child._proto );
+			$.widget( childPrototype.namespace + "." + childPrototype.widgetName, constructor, child._proto );
 		});
 		// remove the list of existing child constructors from the old constructor
 		// so the old child constructors can be garbage collected
@@ -120,12 +161,12 @@ $.widget145 = function( name, base, prototype ) {
 		base._childConstructors.push( constructor );
 	}
 
-	$.widget145.bridge( name, constructor );
+	$.widget.bridge( name, constructor );
 
 	return constructor;
 };
 
-$.widget145.extend = function( target ) {
+$.widget.extend = function( target ) {
 	var input = slice.call( arguments, 1 ),
 		inputIndex = 0,
 		inputLength = input.length,
@@ -138,9 +179,9 @@ $.widget145.extend = function( target ) {
 				// Clone objects
 				if ( $.isPlainObject( value ) ) {
 					target[ key ] = $.isPlainObject( target[ key ] ) ?
-						$.widget145.extend( {}, target[ key ], value ) :
+						$.widget.extend( {}, target[ key ], value ) :
 						// Don't extend strings, arrays, etc. with objects
-						$.widget145.extend( {}, value );
+						$.widget.extend( {}, value );
 				// Copy everything else by reference
 				} else {
 					target[ key ] = value;
@@ -151,7 +192,7 @@ $.widget145.extend = function( target ) {
 	return target;
 };
 
-$.widget145.bridge = function( name, object ) {
+$.widget.bridge = function( name, object ) {
 	var fullName = object.prototype.widgetFullName || name;
 	$.fn[ name ] = function( options ) {
 		var isMethodCall = typeof options === "string",
@@ -160,7 +201,7 @@ $.widget145.bridge = function( name, object ) {
 
 		// allow multiple hashes to be passed on init
 		options = !isMethodCall && args.length ?
-			$.widget145.extend.apply( null, [ options ].concat(args) ) :
+			$.widget.extend.apply( null, [ options ].concat(args) ) :
 			options;
 
 		if ( isMethodCall ) {
@@ -201,10 +242,10 @@ $.widget145.bridge = function( name, object ) {
 	};
 };
 
-$.Widget145 = function( /* options, element */ ) {};
-$.Widget145._childConstructors = [];
+$.Widget = function( /* options, element */ ) {};
+$.Widget._childConstructors = [];
 
-$.Widget145.prototype = {
+$.Widget.prototype = {
 	widgetName: "widget",
 	widgetEventPrefix: "",
 	defaultElement: "<div>",
@@ -219,7 +260,7 @@ $.Widget145.prototype = {
 		this.element = $( element );
 		this.uuid = uuid++;
 		this.eventNamespace = "." + this.widgetName + this.uuid;
-		this.options = $.widget145.extend( {},
+		this.options = $.widget.extend( {},
 			this.options,
 			this._getCreateOptions(),
 			options );
@@ -290,7 +331,7 @@ $.Widget145.prototype = {
 
 		if ( arguments.length === 0 ) {
 			// don't return a reference to the internal hash
-			return $.widget145.extend( {}, this.options );
+			return $.widget.extend( {}, this.options );
 		}
 
 		if ( typeof key === "string" ) {
@@ -299,7 +340,7 @@ $.Widget145.prototype = {
 			parts = key.split( "." );
 			key = parts.shift();
 			if ( parts.length ) {
-				curOption = options[ key ] = $.widget145.extend( {}, this.options[ key ] );
+				curOption = options[ key ] = $.widget.extend( {}, this.options[ key ] );
 				for ( i = 0; i < parts.length - 1; i++ ) {
 					curOption[ parts[ i ] ] = curOption[ parts[ i ] ] || {};
 					curOption = curOption[ parts[ i ] ];
@@ -472,7 +513,7 @@ $.Widget145.prototype = {
 };
 
 $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
-	$.Widget145.prototype[ "_" + method ] = function( element, options, callback ) {
+	$.Widget.prototype[ "_" + method ] = function( element, options, callback ) {
 		if ( typeof options === "string" ) {
 			options = { effect: options };
 		}
@@ -509,14 +550,13 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
 
 })( jQuery );
 
-// jquery.mobile.data
 (function( $, window, undefined ) {
 	var nsNormalizeDict = {},
 		oldFind = $.find,
 		rbrace = /(?:\{[\s\S]*\}|\[[\s\S]*\])$/,
 		jqmDataRE = /:jqmData\(([^)]*)\)/g;
 
-	$.extend( $.mobile145, {
+	$.extend( $.mobile, {
 
 		// Namespace used framework-wide for data-attrs. Default is no namespace
 
@@ -530,7 +570,7 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
 			element = element.jquery ? element[0] : element;
 
 			if ( element && element.getAttribute ) {
-				data = element.getAttribute( "data-" + $.mobile145.ns + key );
+				data = element.getAttribute( "data-" + $.mobile.ns + key );
 			}
 
 			// Copied from core's src/data.js:dataAttr()
@@ -556,7 +596,7 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
 		// to our nsNormalizeDict so we don't have to do this again.
 		nsNormalize: function( prop ) {
 			return nsNormalizeDict[ prop ] ||
-				( nsNormalizeDict[ prop ] = $.camelCase( $.mobile145.ns + prop ) );
+				( nsNormalizeDict[ prop ] = $.camelCase( $.mobile.ns + prop ) );
 		},
 
 		// Find the closest javascript page element to gather settings data jsperf test
@@ -578,7 +618,7 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
 		var result;
 		if ( typeof prop !== "undefined" ) {
 			if ( prop ) {
-				prop = $.mobile145.nsNormalize( prop );
+				prop = $.mobile.nsNormalize( prop );
 			}
 
 			// undefined is permitted as an explicit input for the second param
@@ -595,22 +635,22 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
 	$.jqmData = function( elem, prop, value ) {
 		var result;
 		if ( typeof prop !== "undefined" ) {
-			result = $.data( elem, prop ? $.mobile145.nsNormalize( prop ) : prop, value );
+			result = $.data( elem, prop ? $.mobile.nsNormalize( prop ) : prop, value );
 		}
 		return result;
 	};
 
 	$.fn.jqmRemoveData = function( prop ) {
-		return this.removeData( $.mobile145.nsNormalize( prop ) );
+		return this.removeData( $.mobile.nsNormalize( prop ) );
 	};
 
 	$.jqmRemoveData = function( elem, prop ) {
-		return $.removeData( elem, $.mobile145.nsNormalize( prop ) );
+		return $.removeData( elem, $.mobile.nsNormalize( prop ) );
 	};
 
 	$.find = function( selector, context, ret, extra ) {
 		if ( selector.indexOf( ":jqmData" ) > -1 ) {
-			selector = selector.replace( jqmDataRE, "[data-" + ( $.mobile145.ns || "" ) + "$1]" );
+			selector = selector.replace( jqmDataRE, "[data-" + ( $.mobile.ns || "" ) + "$1]" );
 		}
 
 		return oldFind.call( this, selector, context, ret, extra );
@@ -620,7 +660,6 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
 
 })( jQuery, this );
 
-// jquery.mobile.widget
 (function( $, undefined ) {
 
 var rcapitals = /[A-Z]/g,
@@ -628,16 +667,16 @@ var rcapitals = /[A-Z]/g,
 		return "-" + c.toLowerCase();
 	};
 
-$.extend( $.Widget145.prototype, {
+$.extend( $.Widget.prototype, {
 	_getCreateOptions: function() {
 		var option, value,
 			elem = this.element[ 0 ],
 			options = {};
 
 		//
-		if ( !$.mobile145.getAttribute( elem, "defaults" ) ) {
+		if ( !$.mobile.getAttribute( elem, "defaults" ) ) {
 			for ( option in this.options ) {
-				value = $.mobile145.getAttribute( elem, option.replace( rcapitals, replaceFunction ) );
+				value = $.mobile.getAttribute( elem, option.replace( rcapitals, replaceFunction ) );
 
 				if ( value != null ) {
 					options[ option ] = value;
@@ -650,19 +689,15 @@ $.extend( $.Widget145.prototype, {
 });
 
 //TODO: Remove in 1.5 for backcompat only
-$.mobile145.widget = $.Widget145;
+$.mobile.widget = $.Widget;
 
 })( jQuery );
 
-// jquery.mobile.defaults
 (function( $, window, undefined ) {
-//>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
-	var __version__ = "dev";
-//>>excludeEnd("jqmBuildExclude");
-	$.extend( $.mobile145, {
+	$.extend( $.mobile, {
 
 		// Version of the jQuery Mobile Framework
-		version: __version__,
+		version: "1.4.5",
 
 		// Deprecated and no longer used in 1.4 remove in 1.5
 		// Define the url parameter used for referencing widget-generated sub-pages.
@@ -746,7 +781,16 @@ $.mobile145.widget = $.Widget145;
 	});
 })( jQuery, this );
 
-// jquery-ui/jquery.ui.core
+/*!
+ * jQuery UI Core c0ab71056b936627e8a7821f03c044aec6280a40
+ * http://jqueryui.com
+ *
+ * Copyright 2013 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://api.jqueryui.com/category/ui-core/
+ */
 (function( $, undefined ) {
 
 var uuid = 0,
@@ -999,7 +1043,7 @@ $.fn.extend({
 	}
 });
 
-// $.ui.plugin is deprecated. Use $.widget145() extensions instead.
+// $.ui.plugin is deprecated. Use $.widget() extensions instead.
 $.ui.plugin = {
 	add: function( module, option, set ) {
 		var i,
@@ -1031,7 +1075,6 @@ $.ui.plugin = {
 
 })( jQuery );
 
-// jquery.ui.helpers
 (function( $, window, undefined ) {
 
 	// Subtract the height of external toolbars from the page height, if the page does not have
@@ -1048,10 +1091,10 @@ $.ui.plugin = {
 			// height from the desired page height.
 			noPadders = function() {
 				var theElement = $( this ),
-					widgetOptions = $.mobile145.toolbar && theElement.data( "mobile-toolbar" ) ?
+					widgetOptions = $.mobile.toolbar && theElement.data( "mobile-toolbar" ) ?
 						theElement.toolbar( "option" ) : {
-							position: theElement.attr( "data-" + $.mobile145.ns + "position" ),
-							updatePagePadding: ( theElement.attr( "data-" + $.mobile145.ns +
+							position: theElement.attr( "data-" + $.mobile.ns + "position" ),
+							updatePagePadding: ( theElement.attr( "data-" + $.mobile.ns +
 								"update-page-padding" ) !== false )
 						};
 
@@ -1083,7 +1126,7 @@ $.ui.plugin = {
 		return Math.max( 0, desiredHeight );
 	};
 
-	$.extend( $.mobile145, {
+	$.extend( $.mobile, {
 		// define the window and the document objects
 		window: $( window ),
 		document: $( document ),
@@ -1097,7 +1140,7 @@ $.ui.plugin = {
 		// Scroll page vertically: scroll to 0 to hide iOS address bar, or pass a Y value
 		silentScroll: function( ypos ) {
 			if ( $.type( ypos ) !== "number" ) {
-				ypos = $.mobile145.defaultHomeScroll;
+				ypos = $.mobile.defaultHomeScroll;
 			}
 
 			// prevent scrollstart and scrollstop events
@@ -1105,7 +1148,7 @@ $.ui.plugin = {
 
 			setTimeout(function() {
 				window.scrollTo( 0, ypos );
-				$.mobile145.document.trigger( "silentscroll", { x: 0, y: ypos });
+				$.mobile.document.trigger( "silentscroll", { x: 0, y: ypos });
 			}, 20 );
 
 			setTimeout(function() {
@@ -1116,22 +1159,22 @@ $.ui.plugin = {
 		getClosestBaseUrl: function( ele )	{
 			// Find the closest page and extract out its url.
 			var url = $( ele ).closest( ".ui-page" ).jqmData( "url" ),
-				base = $.mobile145.path.documentBase.hrefNoHash;
+				base = $.mobile.path.documentBase.hrefNoHash;
 
-			if ( !$.mobile145.dynamicBaseEnabled || !url || !$.mobile145.path.isPath( url ) ) {
+			if ( !$.mobile.dynamicBaseEnabled || !url || !$.mobile.path.isPath( url ) ) {
 				url = base;
 			}
 
-			return $.mobile145.path.makeUrlAbsolute( url, base );
+			return $.mobile.path.makeUrlAbsolute( url, base );
 		},
 		removeActiveLinkClass: function( forceRemoval ) {
-			if ( !!$.mobile145.activeClickedLink &&
-				( !$.mobile145.activeClickedLink.closest( "." + $.mobile145.activePageClass ).length ||
+			if ( !!$.mobile.activeClickedLink &&
+				( !$.mobile.activeClickedLink.closest( "." + $.mobile.activePageClass ).length ||
 					forceRemoval ) ) {
 
-				$.mobile145.activeClickedLink.removeClass( $.mobile145.activeBtnClass );
+				$.mobile.activeClickedLink.removeClass( $.mobile.activeBtnClass );
 			}
-			$.mobile145.activeClickedLink = null;
+			$.mobile.activeClickedLink = null;
 		},
 
 		// DEPRECATED in 1.4
@@ -1168,7 +1211,7 @@ $.ui.plugin = {
 		},
 
 		haveParents: function( elements, attr ) {
-			if ( !$.mobile145.ignoreContentEnabled ) {
+			if ( !$.mobile.ignoreContentEnabled ) {
 				return elements;
 			}
 
@@ -1183,7 +1226,7 @@ $.ui.plugin = {
 				e = elements[ i ];
 
 				while ( e ) {
-					c = e.getAttribute ? e.getAttribute( "data-" + $.mobile145.ns + attr ) : "";
+					c = e.getAttribute ? e.getAttribute( "data-" + $.mobile.ns + attr ) : "";
 
 					if ( c === "false" ) {
 						excluded = true;
@@ -1204,17 +1247,17 @@ $.ui.plugin = {
 		getScreenHeight: function() {
 			// Native innerHeight returns more accurate value for this across platforms,
 			// jQuery version is here as a normalized fallback for platforms like Symbian
-			return window.innerHeight || $.mobile145.window.height();
+			return window.innerHeight || $.mobile.window.height();
 		},
 
 		//simply set the active page's minimum height to screen height, depending on orientation
 		resetActivePageHeight: function( height ) {
-			var page = $( "." + $.mobile145.activePageClass ),
+			var page = $( "." + $.mobile.activePageClass ),
 				pageHeight = page.height(),
 				pageOuterHeight = page.outerHeight( true );
 
 			height = compensateToolbars( page,
-				( typeof height === "number" ) ? height : $.mobile145.getScreenHeight() );
+				( typeof height === "number" ) ? height : $.mobile.getScreenHeight() );
 
 			// Remove any previous min-height setting
 			page.css( "min-height", "" );
@@ -1227,7 +1270,7 @@ $.ui.plugin = {
 
 		loading: function() {
 			// If this is the first call to this function, instantiate a loader widget
-			var loader = this.loading._widget || $( $.mobile145.loader.prototype.defaultHtml ).loader(),
+			var loader = this.loading._widget || $( $.mobile.loader.prototype.defaultHtml ).loader(),
 
 				// Call the appropriate method on the loader
 				returnValue = loader.loader.apply( loader, arguments );
@@ -1256,22 +1299,22 @@ $.ui.plugin = {
 		enhanceWithin: function() {
 			var index,
 				widgetElements = {},
-				keepNative = $.mobile145.page.prototype.keepNativeSelector(),
+				keepNative = $.mobile.page.prototype.keepNativeSelector(),
 				that = this;
 
 			// Add no js class to elements
-			if ( $.mobile145.nojs ) {
-				$.mobile145.nojs( this );
+			if ( $.mobile.nojs ) {
+				$.mobile.nojs( this );
 			}
 
 			// Bind links for ajax nav
-			if ( $.mobile145.links ) {
-				$.mobile145.links( this );
+			if ( $.mobile.links ) {
+				$.mobile.links( this );
 			}
 
 			// Degrade inputs for styleing
-			if ( $.mobile145.degradeInputsWithin ) {
-				$.mobile145.degradeInputsWithin( this );
+			if ( $.mobile.degradeInputsWithin ) {
+				$.mobile.degradeInputsWithin( this );
 			}
 
 			// Run buttonmarkup
@@ -1287,19 +1330,19 @@ $.ui.plugin = {
 			}
 
 			// Enhance widgets
-			$.each( $.mobile145.widgets, function( name, constructor ) {
+			$.each( $.mobile.widgets, function( name, constructor ) {
 
 				// If initSelector not false find elements
 				if ( constructor.initSelector ) {
 
 					// Filter elements that should not be enhanced based on parents
-					var elements = $.mobile145.enhanceable( that.find( constructor.initSelector ) );
+					var elements = $.mobile.enhanceable( that.find( constructor.initSelector ) );
 
 					// If any matching elements remain filter ones with keepNativeSelector
 					if ( elements.length > 0 ) {
 
-						// $.mobile145.page.prototype.keepNativeSelector is deprecated this is just for backcompat
-						// Switch to $.mobile145.keepNative in 1.5 which is just a value not a function
+						// $.mobile.page.prototype.keepNativeSelector is deprecated this is just for backcompat
+						// Switch to $.mobile.keepNative in 1.5 which is just a value not a function
 						elements = elements.not( keepNative );
 					}
 
@@ -1330,11 +1373,11 @@ $.ui.plugin = {
 
 		// fluent helper function for the mobile namespaced equivalent
 		jqmEnhanceable: function() {
-			return $.mobile145.enhanceable( this );
+			return $.mobile.enhanceable( this );
 		},
 
 		jqmHijackable: function() {
-			return $.mobile145.hijackable( this );
+			return $.mobile.hijackable( this );
 		}
 	});
 
@@ -1361,7 +1404,7 @@ $.ui.plugin = {
 
 })( jQuery, this );
 
-// widgets/addFirstLastClasses
+
 (function( $, undefined ) {
 
 var uiScreenHiddenRegex = /\bui-screen-hidden\b/;
@@ -1379,7 +1422,7 @@ function noHiddenClass( elements ) {
 	return $( result );
 }
 
-$.mobile145.behaviors.addFirstLastClasses = {
+$.mobile.behaviors.addFirstLastClasses = {
 	_getVisibles: function( $els, create ) {
 		var visibles;
 
@@ -1410,12 +1453,11 @@ $.mobile145.behaviors.addFirstLastClasses = {
 
 })( jQuery );
 
-// widgets/listview
 (function( $, undefined ) {
 
-var getAttr = $.mobile145.getAttribute;
+var getAttr = $.mobile.getAttribute;
 
-$.widget145( "mobile.listview145", $.extend( {
+$.widget( "mobile.listview", $.extend( {
 
 	options: {
 		theme: null,
@@ -1611,6 +1653,8 @@ $.widget145( "mobile.listview145", $.extend( {
 
 		this._addFirstLastClasses( li, this._getVisibles( li, create ), create );
 	}
-}, $.mobile145.behaviors.addFirstLastClasses ) );
+}, $.mobile.behaviors.addFirstLastClasses ) );
 
 })( jQuery );
+
+}));
