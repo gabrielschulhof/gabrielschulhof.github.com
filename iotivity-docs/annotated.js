@@ -1,0 +1,25 @@
+var annotated =
+[
+    [ "OCCallbackData", "struct_o_c_callback_data.html", "struct_o_c_callback_data" ],
+    [ "OCClientResponse", "struct_o_c_client_response.html", "struct_o_c_client_response" ],
+    [ "OCDevAddr", "struct_o_c_dev_addr.html", "struct_o_c_dev_addr" ],
+    [ "OCDeviceInfo", "struct_o_c_device_info.html", "struct_o_c_device_info" ],
+    [ "OCDevicePayload", "struct_o_c_device_payload.html", "struct_o_c_device_payload" ],
+    [ "OCDiscoveryPayload", "struct_o_c_discovery_payload.html", "struct_o_c_discovery_payload" ],
+    [ "OCEntityHandlerRequest", "struct_o_c_entity_handler_request.html", "struct_o_c_entity_handler_request" ],
+    [ "OCEntityHandlerResponse", "struct_o_c_entity_handler_response.html", "struct_o_c_entity_handler_response" ],
+    [ "OCHeaderOption", "struct_o_c_header_option.html", "struct_o_c_header_option" ],
+    [ "OCIdentity", "struct_o_c_identity.html", "struct_o_c_identity" ],
+    [ "OCObservationInfo", "struct_o_c_observation_info.html", "struct_o_c_observation_info" ],
+    [ "OCPayload", "struct_o_c_payload.html", "struct_o_c_payload" ],
+    [ "OCPersistentStorage", "struct_o_c_persistent_storage.html", "struct_o_c_persistent_storage" ],
+    [ "OCPlatformInfo", "struct_o_c_platform_info.html", "struct_o_c_platform_info" ],
+    [ "OCPlatformPayload", "struct_o_c_platform_payload.html", "struct_o_c_platform_payload" ],
+    [ "OCPresencePayload", "struct_o_c_presence_payload.html", "struct_o_c_presence_payload" ],
+    [ "OCRepPayload", "struct_o_c_rep_payload.html", "struct_o_c_rep_payload" ],
+    [ "OCRepPayloadValue", "struct_o_c_rep_payload_value.html", "struct_o_c_rep_payload_value" ],
+    [ "OCRepPayloadValueArray", "struct_o_c_rep_payload_value_array.html", "struct_o_c_rep_payload_value_array" ],
+    [ "OCResourcePayload", "struct_o_c_resource_payload.html", "struct_o_c_resource_payload" ],
+    [ "OCSecurityPayload", "struct_o_c_security_payload.html", "struct_o_c_security_payload" ],
+    [ "OCStringLL", "struct_o_c_string_l_l.html", "struct_o_c_string_l_l" ]
+];

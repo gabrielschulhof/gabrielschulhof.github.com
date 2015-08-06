@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['calcdimtotal',['calcDimTotal',['../ocpayload_8h.html#abe325d6a025cf53f98d19cecb3208913',1,'ocpayload.h']]],
+  ['cb',['cb',['../struct_o_c_callback_data.html#a77219e4eb938d047a96dd8d9d4a283d7',1,'OCCallbackData']]],
+  ['cd',['cd',['../struct_o_c_callback_data.html#a399a273182ce8fd3e02be70c5ac43662',1,'OCCallbackData']]],
+  ['close',['close',['../struct_o_c_persistent_storage.html#ae97c6c2abb74bb73485e183d43346c2f',1,'OCPersistentStorage']]],
+  ['conntype',['connType',['../struct_o_c_client_response.html#a90b98eb2f371324c1daaef4fdf70b069',1,'OCClientResponse']]],
+  ['context',['context',['../struct_o_c_callback_data.html#a21d99e3c61b34603929bb3ccb6d4e4a1',1,'OCCallbackData']]],
+  ['ct_5fadapter_5fgatt_5fbtle',['CT_ADAPTER_GATT_BTLE',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aa07a23738c69bf00a022739361a188f32',1,'octypes.h']]],
+  ['ct_5fadapter_5fip',['CT_ADAPTER_IP',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aa30087326aae9dc82c1a4a32875aa2ba3',1,'octypes.h']]],
+  ['ct_5fadapter_5frfcomm_5fbtedr',['CT_ADAPTER_RFCOMM_BTEDR',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aa8e79790046bf5969a83888a1c587d441',1,'octypes.h']]],
+  ['ct_5fadapter_5fshift',['CT_ADAPTER_SHIFT',['../octypes_8h.html#aafeba0c17476fd1d0bb50b4c069f1f84',1,'octypes.h']]],
+  ['ct_5fdefault',['CT_DEFAULT',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aa82f0296f17eba0a23cc7ef63946c27d9',1,'octypes.h']]],
+  ['ct_5fflag_5fsecure',['CT_FLAG_SECURE',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aab599f750f3815ff13a15cff928fc3bea',1,'octypes.h']]],
+  ['ct_5fip_5fuse_5fv4',['CT_IP_USE_V4',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aaf80bdfde14eb944dd6dad509a05f4430',1,'octypes.h']]],
+  ['ct_5fip_5fuse_5fv6',['CT_IP_USE_V6',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aa3ba935b012e57f3b8b5193c7b0fbfbdb',1,'octypes.h']]],
+  ['ct_5fmask_5fadapter',['CT_MASK_ADAPTER',['../octypes_8h.html#a1e4113a3841beebcc2cafc7e64a07cec',1,'octypes.h']]],
+  ['ct_5fmask_5fflags',['CT_MASK_FLAGS',['../octypes_8h.html#a213ff7594daabf46a6f14a206a8a3bf8',1,'octypes.h']]],
+  ['ct_5fscope_5fadmin',['CT_SCOPE_ADMIN',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aa68e6e39b581eb3d077f4a7a2c6423466',1,'octypes.h']]],
+  ['ct_5fscope_5fglobal',['CT_SCOPE_GLOBAL',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aa6e94c629b703fab38f39889a00f6c69b',1,'octypes.h']]],
+  ['ct_5fscope_5finterface',['CT_SCOPE_INTERFACE',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aa846c93924406a5901075065a5434fea2',1,'octypes.h']]],
+  ['ct_5fscope_5flink',['CT_SCOPE_LINK',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aa03d6ea741d72040fde634c0ea634a8f0',1,'octypes.h']]],
+  ['ct_5fscope_5forg',['CT_SCOPE_ORG',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aafef4b8f440039c26771f8fdde57e99d4',1,'octypes.h']]],
+  ['ct_5fscope_5frealm',['CT_SCOPE_REALM',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aa0883650f9f0f3caae2f853064ab4444e',1,'octypes.h']]],
+  ['ct_5fscope_5fsite',['CT_SCOPE_SITE',['../octypes_8h.html#a916b07a8f92b7cd59809e83309846b4aabf8a0089eb6c6e44b39059de32c3496e',1,'octypes.h']]]
+];
