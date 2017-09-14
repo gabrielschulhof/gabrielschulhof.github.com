@@ -2,6 +2,7 @@ API to expose to JS:
 ```C
 void do_something(void (*when_done)(void));
 ```
+Note that `when_done()` will be called asynchronously.
 
 Use case (JS):
 ```JS
