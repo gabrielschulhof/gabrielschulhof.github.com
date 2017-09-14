@@ -17,7 +17,6 @@ jerry_value_t bind__do_something(const jerry_value_t func,
                                  const jerry_value_t args_p[],
                                  const jerry_length_t args_count)
 {
-  js_callback = jerry_acquire_value(args_p[0]);
   do_something(call_js_do_something_callback, (void *)jerry_acquire_value(args_p[0]));
   return 0;
 }
