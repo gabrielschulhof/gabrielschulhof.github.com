@@ -39,6 +39,7 @@ function reflectState() {
   state.desired = $('#desired').toggleClass('ui-btn-b', state.desired === 'b');
 
   // Set `correct` and `money`.
+  alert((state.correct * state.price));
   $('#correct').text("" + state.correct);
   $('#money').text("" + (state.correct * state.price));
 
