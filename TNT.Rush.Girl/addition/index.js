@@ -86,7 +86,7 @@ $('.counter').on('vclick', function() {
   btn.text(+btn.text() + 1);
   if (btn.attr('id') === 'correct') {
     money = $("#money");
-    money.text(+money.text() + 1);
+    money.text(+money.text() + 0.25);
   }
   saveState();
 });
