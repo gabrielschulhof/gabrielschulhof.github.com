@@ -1,8 +1,32 @@
+(function() {
+
+let clearState = 0;
+
+const defaultState = {
+    array: [
+      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
+      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
+      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
+      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
+      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
+      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
+      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
+      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
+      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
+      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ]
+    ],
+    desired: 'b',
+    correct: 0,
+    incorrect: 0
+  };
+;
+
 function reflectState() {
-  const state = Cookies.getJSON('state');
+  const state = Cookies.getJSON('state') || JSON.parse(JSON.stringify(defaultState));
 
   // Set the toggles from values in `array`.
   const toggles = $('tr.toggles');
+
   for (let row = 0; row < toggles.length; row++) {
     const buttons = $(toggles[row]).find('a');
     for (let col = 0; col < buttons.length; col++) {
@@ -22,23 +46,10 @@ function reflectState() {
 }
 
 function saveState() {
-  const state = {
-    array: [
-      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
-      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
-      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
-      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
-      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
-      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
-      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
-      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
-      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ],
-      ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a' ]
-    ],
-    desired: 'b',
-    correct: 0,
-    incorrect: 0
-  };
+  clearState = 0;
+  $('#clear').text('Clear');
+
+  const state = JSON.parse(JSON.stringify(defaultState));
 
   // Determine the values in `array`.
   const toggles = $('tr.toggles');
@@ -65,12 +76,12 @@ $(document).on('ready', function() {
 
 reflectState();
 
-$('.toggle').add('#desired').on('click', function() {
+$('.toggle').add('#desired').on('vmousedown', function() {
   $(this).toggleClass('ui-btn-b');
   saveState();
 });
 
-$('.counter').on('click', function() {
+$('.counter').on('vclick', function() {
   const btn = $(this);
   btn.text(+btn.text() + 1);
   if (btn.attr('id') === 'correct') {
@@ -80,4 +91,18 @@ $('.counter').on('click', function() {
   saveState();
 });
 
+$('#clear').on('vclick', function() {
+  if (clearState === 0) {
+    clearState = 1;
+    $('#clear').text('Really?');
+    return;
+  }
+
+  Cookies.set('state', defaultState);
+  reflectState();
+  $('#clear').text('Clear');
 });
+
+});
+
+})();
