@@ -17,7 +17,8 @@ const defaultState = {
     ],
     desired: 'b',
     correct: 0,
-    incorrect: 0
+    incorrect: 0,
+    price: 0.25,
   };
 ;
 
@@ -39,7 +40,7 @@ function reflectState() {
 
   // Set `correct` and `money`.
   $('#correct').text("" + state.correct);
-  $('#money').text("" + state.correct);
+  $('#money').text("" + (state.correct * state.price));
 
   // Set `incorrect`.
   $('#incorrect').text("" + state.incorrect);
@@ -86,7 +87,7 @@ $('.counter').on('vclick', function() {
   btn.text(+btn.text() + 1);
   if (btn.attr('id') === 'correct') {
     money = $("#money");
-    money.text(+money.text() + 0.25);
+    money.text(+money.text() + state.price);
   }
   saveState();
 });
