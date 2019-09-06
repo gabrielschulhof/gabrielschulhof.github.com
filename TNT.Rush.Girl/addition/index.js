@@ -1,6 +1,24 @@
 function reflectState() {
   const state = Cookies.getJSON('state');
-  console.log(JSON.stringify(state, null, 4));
+
+  // Set the toggles from values in `array`.
+  const toggles = $('tr.toggles');
+  for (let row = 0; row < toggles.length; row++) {
+    const buttons = $(toggles[row]).find('a');
+    for (let col = 0; col < buttons.length; col++) {
+      $(buttons[col]).toggleClass('ui-btn-b', state.array[row][col] === 'b');
+    }
+  }
+
+  // Set `desired`.
+  state.desired = $('#desired').toggleClass('ui-btn-b', state.desired === 'b');
+
+  // Set `correct` and `money`.
+  $('#correct').text("" + state.correct);
+  $('#money').text("" + state.correct);
+
+  // Set `incorrect`.
+  $('#incorrect').text("" + state.incorrect);
 }
 
 function saveState() {
@@ -39,8 +57,6 @@ function saveState() {
 
   // Determine `incorrect`.
   state.incorrect = +$('#incorrect').text();
-
-  console.log('state: ' + JSON.stringify(state, null, 4));
 
   Cookies.set('state', state);
 }
