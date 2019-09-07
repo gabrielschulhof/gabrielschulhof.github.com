@@ -39,7 +39,6 @@ function reflectState() {
   state.desired = $('#desired').toggleClass('ui-btn-b', state.desired === 'b');
 
   // Set `correct` and `money`.
-  alert((state.correct * state.price));
   $('#correct').text("" + state.correct);
   $('#money').text("" + (state.correct * state.price));
 
@@ -84,11 +83,12 @@ $('.toggle').add('#desired').on('vmousedown', function() {
 });
 
 $('.counter').on('vclick', function() {
+  const state = Cookies.getJSON('state');
   const btn = $(this);
   btn.text(+btn.text() + 1);
   if (btn.attr('id') === 'correct') {
     money = $("#money");
-    money.text(+money.text() + state.price);
+    money.text((+money.text()) + state.price);
   }
   saveState();
 });
