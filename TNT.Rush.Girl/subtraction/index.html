@@ -1,0 +1,262 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Addition</title>
+  <link rel="stylesheet" href="jquery.mobile-1.4.5.min.css">
+  <script src="jquery-2.2.4.js"></script>
+  <script src="jquery.mobile-1.4.5.min.js"></script>
+  <script src="js.cookie.js"></script>
+  <script src="index.js"></script>
+  <style>
+    table {
+      border-spacing: 0;
+    }
+    td {
+      text-align: center;
+    }
+    .ui-page {
+      margin: 0.5em;
+    }
+    .toggle {
+      margin: 0px;
+      width: 2em;
+      height: 2em;
+      padding: 0px;
+      font-size: 14px;
+    }
+    #correct {
+      color: green;
+    }
+    #incorrect {
+      color: darkred;
+    }
+  </style>
+</head>
+<body>
+  <div data-role="page">
+    <form>
+      <table>
+        <tr>
+          <td></td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td>
+        </tr>
+        <tr class='toggles'>
+          <td>18</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>17</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>16</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>15</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>14</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>13</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>12</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>11</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>10</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>9</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>8</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>7</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>6</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>5</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>4</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>3</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>2</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>1</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+        <tr class='toggles'>
+          <td>0</td>
+          <td><a href="#" class="ui-btn ui-corner-all ui-btn-inline toggle"></a>
+        </tr>
+      </table>
+
+    <div data-role="controlgroup" data-type="horizontal">
+      <a href="#" id="correct" class="ui-btn ui-corner-all ui-btn-inline counter">0</a>
+      <a href="#" id="incorrect" class="ui-btn ui-corner-all ui-btn-inline counter">0</a>
+      <a href="#" id="desired" class="ui-btn ui-corner-all ui-btn-inline ui-btn-b">Desired</a>
+    </div>
+
+    <p>
+    <span>Money earned so far: $</span><span id="money">0</span>
+    </p>
+
+      <a href="#" id="clear" class="ui-btn ui-corner-all ui-btn-inline">Clear</a>
+    </form>
+  </div>
+</body>
+</html>
