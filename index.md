@@ -3,7 +3,7 @@
 * [JerryScript Modules](presentations/JerryScript-modules.pdf)
 * [Blog Post](./native-addons-are-close-to-being-on-par-with-js-modules.md)
 # TeXmacs patches
-<a href="https://savannah.gnu.org/patch/?func=detailitem&item_id=1009">1009</a>
+X <a href="https://savannah.gnu.org/patch/?func=detailitem&item_id=1009">1009</a>
 https://savannah.gnu.org/patch/?func=detailitem&item_id=1032
 https://savannah.gnu.org/patch/?func=detailitem&item_id=1087
 https://savannah.gnu.org/patch/?func=detailitem&item_id=1088
