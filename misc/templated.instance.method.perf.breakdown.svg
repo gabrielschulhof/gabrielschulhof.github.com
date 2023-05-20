@@ -1,0 +1,793 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" width="1200" height="534" onload="init(evt)" viewBox="0 0 1200 534" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples. -->
+<!-- NOTES:  -->
+<defs>
+	<linearGradient id="background" y1="0" y2="1" x1="0" x2="0" >
+		<stop stop-color="#eeeeee" offset="5%" />
+		<stop stop-color="#eeeeb0" offset="95%" />
+	</linearGradient>
+</defs>
+<style type="text/css">
+	text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }
+	#search, #ignorecase { opacity:0.1; cursor:pointer; }
+	#search:hover, #search.show, #ignorecase:hover, #ignorecase.show { opacity:1; }
+	#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+	#title { text-anchor:middle; font-size:17px}
+	#unzoom { cursor:pointer; }
+	#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+	.hide { display:none; }
+	.parent { opacity:0.5; }
+</style>
+<script type="text/ecmascript">
+<![CDATA[
+	"use strict";
+	var details, searchbtn, unzoombtn, matchedtxt, svg, searching, currentSearchTerm, ignorecase, ignorecaseBtn;
+	function init(evt) {
+		details = document.getElementById("details").firstChild;
+		searchbtn = document.getElementById("search");
+		ignorecaseBtn = document.getElementById("ignorecase");
+		unzoombtn = document.getElementById("unzoom");
+		matchedtxt = document.getElementById("matched");
+		svg = document.getElementsByTagName("svg")[0];
+		searching = 0;
+		currentSearchTerm = null;
+
+		// use GET parameters to restore a flamegraphs state.
+		var params = get_params();
+		if (params.x && params.y)
+			zoom(find_group(document.querySelector('[x="' + params.x + '"][y="' + params.y + '"]')));
+                if (params.s) search(params.s);
+	}
+
+	// event listeners
+	window.addEventListener("click", function(e) {
+		var target = find_group(e.target);
+		if (target) {
+			if (target.nodeName == "a") {
+				if (e.ctrlKey === false) return;
+				e.preventDefault();
+			}
+			if (target.classList.contains("parent")) unzoom(true);
+			zoom(target);
+			if (!document.querySelector('.parent')) {
+				// we have basically done a clearzoom so clear the url
+				var params = get_params();
+				if (params.x) delete params.x;
+				if (params.y) delete params.y;
+				history.replaceState(null, null, parse_params(params));
+				unzoombtn.classList.add("hide");
+				return;
+			}
+
+			// set parameters for zoom state
+			var el = target.querySelector("rect");
+			if (el && el.attributes && el.attributes.y && el.attributes._orig_x) {
+				var params = get_params()
+				params.x = el.attributes._orig_x.value;
+				params.y = el.attributes.y.value;
+				history.replaceState(null, null, parse_params(params));
+			}
+		}
+		else if (e.target.id == "unzoom") clearzoom();
+		else if (e.target.id == "search") search_prompt();
+		else if (e.target.id == "ignorecase") toggle_ignorecase();
+	}, false)
+
+	// mouse-over for info
+	// show
+	window.addEventListener("mouseover", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = "Function: " + g_to_text(target);
+	}, false)
+
+	// clear
+	window.addEventListener("mouseout", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = ' ';
+	}, false)
+
+	// ctrl-F for search
+	// ctrl-I to toggle case-sensitive search
+	window.addEventListener("keydown",function (e) {
+		if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
+			e.preventDefault();
+			search_prompt();
+		}
+		else if (e.ctrlKey && e.keyCode === 73) {
+			e.preventDefault();
+			toggle_ignorecase();
+		}
+	}, false)
+
+	// functions
+	function get_params() {
+		var params = {};
+		var paramsarr = window.location.search.substr(1).split('&');
+		for (var i = 0; i < paramsarr.length; ++i) {
+			var tmp = paramsarr[i].split("=");
+			if (!tmp[0] || !tmp[1]) continue;
+			params[tmp[0]]  = decodeURIComponent(tmp[1]);
+		}
+		return params;
+	}
+	function parse_params(params) {
+		var uri = "?";
+		for (var key in params) {
+			uri += key + '=' + encodeURIComponent(params[key]) + '&';
+		}
+		if (uri.slice(-1) == "&")
+			uri = uri.substring(0, uri.length - 1);
+		if (uri == '?')
+			uri = window.location.href.split('?')[0];
+		return uri;
+	}
+	function find_child(node, selector) {
+		var children = node.querySelectorAll(selector);
+		if (children.length) return children[0];
+	}
+	function find_group(node) {
+		var parent = node.parentElement;
+		if (!parent) return;
+		if (parent.id == "frames") return node;
+		return find_group(parent);
+	}
+	function orig_save(e, attr, val) {
+		if (e.attributes["_orig_" + attr] != undefined) return;
+		if (e.attributes[attr] == undefined) return;
+		if (val == undefined) val = e.attributes[attr].value;
+		e.setAttribute("_orig_" + attr, val);
+	}
+	function orig_load(e, attr) {
+		if (e.attributes["_orig_"+attr] == undefined) return;
+		e.attributes[attr].value = e.attributes["_orig_" + attr].value;
+		e.removeAttribute("_orig_"+attr);
+	}
+	function g_to_text(e) {
+		var text = find_child(e, "title").firstChild.nodeValue;
+		return (text)
+	}
+	function g_to_func(e) {
+		var func = g_to_text(e);
+		// if there's any manipulation we want to do to the function
+		// name before it's searched, do it here before returning.
+		return (func);
+	}
+	function update_text(e) {
+		var r = find_child(e, "rect");
+		var t = find_child(e, "text");
+		var w = parseFloat(r.attributes.width.value) -3;
+		var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+		t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+
+		// Smaller than this size won't fit anything
+		if (w < 2 * 12 * 0.59) {
+			t.textContent = "";
+			return;
+		}
+
+		t.textContent = txt;
+		var sl = t.getSubStringLength(0, txt.length);
+		// check if only whitespace or if we can fit the entire string into width w
+		if (/^ *$/.test(txt) || sl < w)
+			return;
+
+		// this isn't perfect, but gives a good starting point
+		// and avoids calling getSubStringLength too often
+		var start = Math.floor((w/sl) * txt.length);
+		for (var x = start; x > 0; x = x-2) {
+			if (t.getSubStringLength(0, x + 2) <= w) {
+				t.textContent = txt.substring(0, x) + "..";
+				return;
+			}
+		}
+		t.textContent = "";
+	}
+
+	// zoom
+	function zoom_reset(e) {
+		if (e.attributes != undefined) {
+			orig_load(e, "x");
+			orig_load(e, "width");
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_reset(c[i]);
+		}
+	}
+	function zoom_child(e, x, ratio) {
+		if (e.attributes != undefined) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - 10) * ratio + 10;
+				if (e.tagName == "text")
+					e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+			}
+		}
+
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_child(c[i], x - 10, ratio);
+		}
+	}
+	function zoom_parent(e) {
+		if (e.attributes) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = 10;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseInt(svg.width.baseVal.value) - (10 * 2);
+			}
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_parent(c[i]);
+		}
+	}
+	function zoom(node) {
+		var attr = find_child(node, "rect").attributes;
+		var width = parseFloat(attr.width.value);
+		var xmin = parseFloat(attr.x.value);
+		var xmax = parseFloat(xmin + width);
+		var ymin = parseFloat(attr.y.value);
+		var ratio = (svg.width.baseVal.value - 2 * 10) / width;
+
+		// XXX: Workaround for JavaScript float issues (fix me)
+		var fudge = 0.0001;
+
+		unzoombtn.classList.remove("hide");
+
+		var el = document.getElementById("frames").children;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var a = find_child(e, "rect").attributes;
+			var ex = parseFloat(a.x.value);
+			var ew = parseFloat(a.width.value);
+			var upstack;
+			// Is it an ancestor
+			if (0 == 0) {
+				upstack = parseFloat(a.y.value) > ymin;
+			} else {
+				upstack = parseFloat(a.y.value) < ymin;
+			}
+			if (upstack) {
+				// Direct ancestor
+				if (ex <= xmin && (ex+ew+fudge) >= xmax) {
+					e.classList.add("parent");
+					zoom_parent(e);
+					update_text(e);
+				}
+				// not in current path
+				else
+					e.classList.add("hide");
+			}
+			// Children maybe
+			else {
+				// no common path
+				if (ex < xmin || ex + fudge >= xmax) {
+					e.classList.add("hide");
+				}
+				else {
+					zoom_child(e, xmin, ratio);
+					update_text(e);
+				}
+			}
+		}
+		search();
+	}
+	function unzoom(dont_update_text) {
+		unzoombtn.classList.add("hide");
+		var el = document.getElementById("frames").children;
+		for(var i = 0; i < el.length; i++) {
+			el[i].classList.remove("parent");
+			el[i].classList.remove("hide");
+			zoom_reset(el[i]);
+			if(!dont_update_text) update_text(el[i]);
+		}
+		search();
+	}
+	function clearzoom() {
+		unzoom();
+
+		// remove zoom state
+		var params = get_params();
+		if (params.x) delete params.x;
+		if (params.y) delete params.y;
+		history.replaceState(null, null, parse_params(params));
+	}
+
+	// search
+	function toggle_ignorecase() {
+		ignorecase = !ignorecase;
+		if (ignorecase) {
+			ignorecaseBtn.classList.add("show");
+		} else {
+			ignorecaseBtn.classList.remove("show");
+		}
+		reset_search();
+		search();
+	}
+	function reset_search() {
+		var el = document.querySelectorAll("#frames rect");
+		for (var i = 0; i < el.length; i++) {
+			orig_load(el[i], "fill")
+		}
+		var params = get_params();
+		delete params.s;
+		history.replaceState(null, null, parse_params(params));
+	}
+	function search_prompt() {
+		if (!searching) {
+			var term = prompt("Enter a search term (regexp " +
+			    "allowed, eg: ^ext4_)"
+			    + (ignorecase ? ", ignoring case" : "")
+			    + "\nPress Ctrl-i to toggle case sensitivity", "");
+			if (term != null) search(term);
+		} else {
+			reset_search();
+			searching = 0;
+			currentSearchTerm = null;
+			searchbtn.classList.remove("show");
+			searchbtn.firstChild.nodeValue = "Search"
+			matchedtxt.classList.add("hide");
+			matchedtxt.firstChild.nodeValue = ""
+		}
+	}
+	function search(term) {
+		if (term) currentSearchTerm = term;
+
+		var re = new RegExp(currentSearchTerm, ignorecase ? 'i' : '');
+		var el = document.getElementById("frames").children;
+		var matches = new Object();
+		var maxwidth = 0;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var func = g_to_func(e);
+			var rect = find_child(e, "rect");
+			if (func == null || rect == null)
+				continue;
+
+			// Save max width. Only works as we have a root frame
+			var w = parseFloat(rect.attributes.width.value);
+			if (w > maxwidth)
+				maxwidth = w;
+
+			if (func.match(re)) {
+				// highlight
+				var x = parseFloat(rect.attributes.x.value);
+				orig_save(rect, "fill");
+				rect.attributes.fill.value = "rgb(230,0,230)";
+
+				// remember matches
+				if (matches[x] == undefined) {
+					matches[x] = w;
+				} else {
+					if (w > matches[x]) {
+						// overwrite with parent
+						matches[x] = w;
+					}
+				}
+				searching = 1;
+			}
+		}
+		if (!searching)
+			return;
+		var params = get_params();
+		params.s = currentSearchTerm;
+		history.replaceState(null, null, parse_params(params));
+
+		searchbtn.classList.add("show");
+		searchbtn.firstChild.nodeValue = "Reset Search";
+
+		// calculate percent matched, excluding vertical overlap
+		var count = 0;
+		var lastx = -1;
+		var lastw = 0;
+		var keys = Array();
+		for (k in matches) {
+			if (matches.hasOwnProperty(k))
+				keys.push(k);
+		}
+		// sort the matched frames by their x location
+		// ascending, then width descending
+		keys.sort(function(a, b){
+			return a - b;
+		});
+		// Step through frames saving only the biggest bottom-up frames
+		// thanks to the sort order. This relies on the tree property
+		// where children are always smaller than their parents.
+		var fudge = 0.0001;	// JavaScript floating point
+		for (var k in keys) {
+			var x = parseFloat(keys[k]);
+			var w = matches[keys[k]];
+			if (x >= lastx + lastw - fudge) {
+				count += w;
+				lastx = x;
+				lastw = w;
+			}
+		}
+		// display matched percent
+		matchedtxt.classList.remove("hide");
+		var pct = 100 * count / maxwidth;
+		if (pct != 100) pct = pct.toFixed(1)
+		matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+	}
+]]>
+</script>
+<rect x="0.0" y="0" width="1200.0" height="534.0" fill="url(#background)"  />
+<text id="title" x="600.00" y="24" >Flame Graph</text>
+<text id="details" x="10.00" y="517" > </text>
+<text id="unzoom" x="10.00" y="24" class="hide">Reset Zoom</text>
+<text id="search" x="1090.00" y="24" >Search</text>
+<text id="ignorecase" x="1174.00" y="24" >ic</text>
+<text id="matched" x="1090.00" y="517" > </text>
+<g id="frames">
+<g >
+<title>Builtins_InterpreterEntryTrampoline (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="261" width="1174.4" height="15.0" fill="rgb(243,114,33)" rx="2" ry="2" />
+<text  x="14.96" y="271.5" >Builtins_InterpreterEntryTrampoline</text>
+</g>
+<g >
+<title>v8::TryCatch::~TryCatch (436,455,211 samples, 2.27%)</title><rect x="927.9" y="85" width="26.8" height="15.0" fill="rgb(249,147,40)" rx="2" ry="2" />
+<text  x="930.93" y="95.5" >v..</text>
+</g>
+<g >
+<title>v8::internal::Object::GetProperty (1,477,352,118 samples, 7.67%)</title><rect x="764.2" y="53" width="90.5" height="15.0" fill="rgb(234,178,5)" rx="2" ry="2" />
+<text  x="767.17" y="63.5" >v8::intern..</text>
+</g>
+<g >
+<title>node::ExecuteBootstrapper (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="357" width="1174.4" height="15.0" fill="rgb(247,132,44)" rx="2" ry="2" />
+<text  x="14.96" y="367.5" >node::ExecuteBootstrapper</text>
+</g>
+<g >
+<title>v8::HandleScope::~HandleScope (119,852,254 samples, 0.62%)</title><rect x="322.2" y="85" width="7.4" height="15.0" fill="rgb(232,25,39)" rx="2" ry="2" />
+<text  x="325.24" y="95.5" ></text>
+</g>
+<g >
+<title>zlib_internal::UncompressHelper (58,121,987 samples, 0.30%)</title><rect x="1186.4" y="293" width="3.6" height="15.0" fill="rgb(241,191,33)" rx="2" ry="2" />
+<text  x="1189.42" y="303.5" ></text>
+</g>
+<g >
+<title>v8::internal::LookupIterator::LookupInRegularHolder&lt;false&gt; (40,175,891 samples, 0.21%)</title><rect x="654.2" y="53" width="2.5" height="15.0" fill="rgb(243,109,2)" rx="2" ry="2" />
+<text  x="657.23" y="63.5" ></text>
+</g>
+<g >
+<title>node (19,260,232,146 samples, 100.00%)</title><rect x="10.0" y="469" width="1180.0" height="15.0" fill="rgb(245,137,11)" rx="2" ry="2" />
+<text  x="13.00" y="479.5" >node</text>
+</g>
+<g >
+<title>node::NodeMainInstance::Run (19,227,903,309 samples, 99.83%)</title><rect x="12.0" y="421" width="1178.0" height="15.0" fill="rgb(227,39,37)" rx="2" ry="2" />
+<text  x="14.96" y="431.5" >node::NodeMainInstance::Run</text>
+</g>
+<g >
+<title>napi_get_cb_info (637,816,707 samples, 3.31%)</title><rect x="156.3" y="101" width="39.1" height="15.0" fill="rgb(219,18,34)" rx="2" ry="2" />
+<text  x="159.30" y="111.5" >nap..</text>
+</g>
+<g >
+<title>v8::internal::PropertyKey::PropertyKey (78,007,122 samples, 0.41%)</title><rect x="575.9" y="69" width="4.8" height="15.0" fill="rgb(205,92,11)" rx="2" ry="2" />
+<text  x="578.89" y="79.5" ></text>
+</g>
+<g >
+<title>v8::External::Value (39,859,947 samples, 0.21%)</title><rect x="1030.4" y="101" width="2.5" height="15.0" fill="rgb(218,86,15)" rx="2" ry="2" />
+<text  x="1033.43" y="111.5" ></text>
+</g>
+<g >
+<title>v8::internal::LookupIterator::Start&lt;false&gt; (120,138,910 samples, 0.62%)</title><rect x="561.2" y="69" width="7.3" height="15.0" fill="rgb(219,95,39)" rx="2" ry="2" />
+<text  x="564.15" y="79.5" ></text>
+</g>
+<g >
+<title>v8::External::Value (1,590,093,740 samples, 8.26%)</title><rect x="1086.5" y="117" width="97.5" height="15.0" fill="rgb(239,38,20)" rx="2" ry="2" />
+<text  x="1089.54" y="127.5" >v8::Externa..</text>
+</g>
+<g >
+<title>node::Start (19,227,903,309 samples, 99.83%)</title><rect x="12.0" y="437" width="1178.0" height="15.0" fill="rgb(241,148,11)" rx="2" ry="2" />
+<text  x="14.96" y="447.5" >node::Start</text>
+</g>
+<g >
+<title>Builtins_JSEntryTrampoline (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="277" width="1174.4" height="15.0" fill="rgb(221,95,14)" rx="2" ry="2" />
+<text  x="14.96" y="287.5" >Builtins_JSEntryTrampoline</text>
+</g>
+<g >
+<title>v8::internal::JSObject::FastPropertyAt (678,104,681 samples, 3.52%)</title><rect x="773.9" y="37" width="41.6" height="15.0" fill="rgb(234,59,31)" rx="2" ry="2" />
+<text  x="776.93" y="47.5" >v8:..</text>
+</g>
+<g >
+<title>v8::internal::LookupIterator::Start&lt;false&gt; (1,754,291,802 samples, 9.11%)</title><rect x="656.7" y="53" width="107.5" height="15.0" fill="rgb(225,29,31)" rx="2" ry="2" />
+<text  x="659.69" y="63.5" >v8::internal:..</text>
+</g>
+<g >
+<title>node_napi_env__::can_call_into_js (315,664,206 samples, 1.64%)</title><rect x="246.6" y="85" width="19.3" height="15.0" fill="rgb(211,82,25)" rx="2" ry="2" />
+<text  x="249.59" y="95.5" ></text>
+</g>
+<g >
+<title>Napi::details::TemplatedInstanceVoidCallback&lt;CBTest, &amp;CBTest::TestMethod&gt; (119,763,411 samples, 0.62%)</title><rect x="68.0" y="133" width="7.4" height="15.0" fill="rgb(252,185,3)" rx="2" ry="2" />
+<text  x="71.03" y="143.5" ></text>
+</g>
+<g >
+<title>v8::Value::IsExternal (77,809,140 samples, 0.40%)</title><rect x="1054.9" y="101" width="4.7" height="15.0" fill="rgb(240,221,0)" rx="2" ry="2" />
+<text  x="1057.85" y="111.5" ></text>
+</g>
+<g >
+<title>Builtins_InterpreterEntryTrampoline (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="245" width="1174.4" height="15.0" fill="rgb(252,121,29)" rx="2" ry="2" />
+<text  x="14.96" y="255.5" >Builtins_InterpreterEntryTrampoline</text>
+</g>
+<g >
+<title>v8::internal::Runtime::GetObjectProperty (4,990,791,179 samples, 25.91%)</title><rect x="580.7" y="69" width="305.7" height="15.0" fill="rgb(234,126,35)" rx="2" ry="2" />
+<text  x="583.67" y="79.5" >v8::internal::Runtime::GetObjectProperty</text>
+</g>
+<g >
+<title>v8::TryCatch::~TryCatch (40,193,954 samples, 0.21%)</title><rect x="1052.4" y="101" width="2.5" height="15.0" fill="rgb(240,141,19)" rx="2" ry="2" />
+<text  x="1055.39" y="111.5" ></text>
+</g>
+<g >
+<title>Builtins_JSEntry (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="293" width="1174.4" height="15.0" fill="rgb(214,17,18)" rx="2" ry="2" />
+<text  x="14.96" y="303.5" >Builtins_JSEntry</text>
+</g>
+<g >
+<title>v8::EscapableHandleScope::EscapableHandleScope (40,141,786 samples, 0.21%)</title><rect x="297.7" y="85" width="2.5" height="15.0" fill="rgb(238,147,9)" rx="2" ry="2" />
+<text  x="300.73" y="95.5" ></text>
+</g>
+<g >
+<title>__libc_start_call_main (19,227,903,309 samples, 99.83%)</title><rect x="12.0" y="453" width="1178.0" height="15.0" fill="rgb(206,208,36)" rx="2" ry="2" />
+<text  x="14.96" y="463.5" >__libc_start_call_main</text>
+</g>
+<g >
+<title>v8::internal::PropertyKey::PropertyKey (518,331,548 samples, 2.69%)</title><rect x="854.7" y="53" width="31.7" height="15.0" fill="rgb(214,42,27)" rx="2" ry="2" />
+<text  x="857.68" y="63.5" >v8..</text>
+</g>
+<g >
+<title>v8::internal::Bootstrapper::CreateEnvironment (58,121,987 samples, 0.30%)</title><rect x="1186.4" y="357" width="3.6" height="15.0" fill="rgb(215,139,21)" rx="2" ry="2" />
+<text  x="1189.42" y="367.5" ></text>
+</g>
+<g >
+<title>v8::TryCatch::HasCaught (160,576,248 samples, 0.83%)</title><rect x="1037.6" y="101" width="9.9" height="15.0" fill="rgb(207,38,9)" rx="2" ry="2" />
+<text  x="1040.64" y="111.5" ></text>
+</g>
+<g >
+<title>v8::internal::HeapObject::IsExternal (119,500,792 samples, 0.62%)</title><rect x="1013.3" y="85" width="7.3" height="15.0" fill="rgb(248,107,24)" rx="2" ry="2" />
+<text  x="1016.27" y="95.5" ></text>
+</g>
+<g >
+<title>Cr_z_inflate_fast (58,121,987 samples, 0.30%)</title><rect x="1186.4" y="261" width="3.6" height="15.0" fill="rgb(218,170,16)" rx="2" ry="2" />
+<text  x="1189.42" y="271.5" ></text>
+</g>
+<g >
+<title>v8::internal::Isolate::UnregisterTryCatchHandler (40,200,811 samples, 0.21%)</title><rect x="1020.6" y="85" width="2.5" height="15.0" fill="rgb(223,97,35)" rx="2" ry="2" />
+<text  x="1023.59" y="95.5" ></text>
+</g>
+<g >
+<title>node::StartExecution (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="389" width="1174.4" height="15.0" fill="rgb(238,76,39)" rx="2" ry="2" />
+<text  x="14.96" y="399.5" >node::StartExecution</text>
+</g>
+<g >
+<title>node::LoadEnvironment (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="405" width="1174.4" height="15.0" fill="rgb(254,122,15)" rx="2" ry="2" />
+<text  x="14.96" y="415.5" >node::LoadEnvironment</text>
+</g>
+<g >
+<title>Builtins_InterpreterEntryTrampoline (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="181" width="1174.4" height="15.0" fill="rgb(206,8,0)" rx="2" ry="2" />
+<text  x="14.96" y="191.5" >Builtins_InterpreterEntryTrampoline</text>
+</g>
+<g >
+<title>v8::TryCatch::TryCatch (556,783,979 samples, 2.89%)</title><rect x="893.8" y="85" width="34.1" height="15.0" fill="rgb(211,100,12)" rx="2" ry="2" />
+<text  x="896.82" y="95.5" >v8..</text>
+</g>
+<g >
+<title>v8::NewContext (58,121,987 samples, 0.30%)</title><rect x="1186.4" y="373" width="3.6" height="15.0" fill="rgb(244,65,23)" rx="2" ry="2" />
+<text  x="1189.42" y="383.5" ></text>
+</g>
+<g >
+<title>node_napi_env__::can_call_into_js (40,182,924 samples, 0.21%)</title><rect x="1023.1" y="101" width="2.4" height="15.0" fill="rgb(233,82,32)" rx="2" ry="2" />
+<text  x="1026.06" y="111.5" ></text>
+</g>
+<g >
+<title>v8::internal::LookupIterator::LookupInRegularHolder&lt;false&gt; (1,473,505,695 samples, 7.65%)</title><rect x="673.9" y="37" width="90.3" height="15.0" fill="rgb(252,176,36)" rx="2" ry="2" />
+<text  x="676.89" y="47.5" >v8::intern..</text>
+</g>
+<g >
+<title>v8::Context::GetNumberOfEmbedderDataFields (80,105,759 samples, 0.42%)</title><rect x="1025.5" y="101" width="4.9" height="15.0" fill="rgb(213,172,14)" rx="2" ry="2" />
+<text  x="1028.52" y="111.5" ></text>
+</g>
+<g >
+<title>v8::CallDepthScope&lt;false&gt;::~CallDepthScope (399,375,565 samples, 2.07%)</title><rect x="265.9" y="85" width="24.5" height="15.0" fill="rgb(238,165,6)" rx="2" ry="2" />
+<text  x="268.93" y="95.5" >v..</text>
+</g>
+<g >
+<title>v8::Value::IsExternal (956,566,024 samples, 4.97%)</title><rect x="954.7" y="85" width="58.6" height="15.0" fill="rgb(244,79,14)" rx="2" ry="2" />
+<text  x="957.67" y="95.5" >v8::Va..</text>
+</g>
+<g >
+<title>v8::Object::Get (9,209,558,230 samples, 47.82%)</title><rect x="329.6" y="85" width="564.2" height="15.0" fill="rgb(242,54,36)" rx="2" ry="2" />
+<text  x="332.58" y="95.5" >v8::Object::Get</text>
+</g>
+<g >
+<title>napi_unwrap (13,509,626,831 samples, 70.14%)</title><rect x="195.4" y="101" width="827.7" height="15.0" fill="rgb(246,212,42)" rx="2" ry="2" />
+<text  x="198.37" y="111.5" >napi_unwrap</text>
+</g>
+<g >
+<title>v8::internal::Genesis::Genesis (58,121,987 samples, 0.30%)</title><rect x="1186.4" y="341" width="3.6" height="15.0" fill="rgb(227,16,10)" rx="2" ry="2" />
+<text  x="1189.42" y="351.5" ></text>
+</g>
+<g >
+<title>v8::Value::IsObject (159,336,806 samples, 0.83%)</title><rect x="1059.6" y="101" width="9.8" height="15.0" fill="rgb(216,56,11)" rx="2" ry="2" />
+<text  x="1062.62" y="111.5" ></text>
+</g>
+<g >
+<title>v8::CallDepthScope&lt;false&gt;::CallDepthScope (1,842,393,164 samples, 9.57%)</title><rect x="404.1" y="69" width="112.9" height="15.0" fill="rgb(226,203,26)" rx="2" ry="2" />
+<text  x="407.14" y="79.5" >v8::CallDepth..</text>
+</g>
+<g >
+<title>v8::EscapableHandleScope::Escape (80,265,713 samples, 0.42%)</title><rect x="300.2" y="85" width="4.9" height="15.0" fill="rgb(219,176,49)" rx="2" ry="2" />
+<text  x="303.18" y="95.5" ></text>
+</g>
+<g >
+<title>v8::Function::Call (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="341" width="1174.4" height="15.0" fill="rgb(253,95,28)" rx="2" ry="2" />
+<text  x="14.96" y="351.5" >v8::Function::Call</text>
+</g>
+<g >
+<title>v8::internal::GetCurrentStackPosition (40,199,572 samples, 0.21%)</title><rect x="925.5" y="69" width="2.4" height="15.0" fill="rgb(224,211,49)" rx="2" ry="2" />
+<text  x="928.46" y="79.5" ></text>
+</g>
+<g >
+<title>Napi::details::TemplatedInstanceVoidCallback&lt;CBTest, &amp;CBTest::TestMethod&gt; (15,463,298,093 samples, 80.29%)</title><rect x="122.0" y="117" width="947.4" height="15.0" fill="rgb(227,218,47)" rx="2" ry="2" />
+<text  x="125.01" y="127.5" >Napi::details::TemplatedInstanceVoidCallback&lt;CBTest, &amp;CBTest::TestMethod&gt;</text>
+</g>
+<g >
+<title>node::StartExecution (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="373" width="1174.4" height="15.0" fill="rgb(224,15,1)" rx="2" ry="2" />
+<text  x="14.96" y="383.5" >node::StartExecution</text>
+</g>
+<g >
+<title>v8::internal::JSObject::FastPropertyAt (40,151,901 samples, 0.21%)</title><rect x="642.0" y="53" width="2.5" height="15.0" fill="rgb(208,3,24)" rx="2" ry="2" />
+<text  x="645.00" y="63.5" ></text>
+</g>
+<g >
+<title>v8::TryCatch::TryCatch (80,249,772 samples, 0.42%)</title><rect x="1047.5" y="101" width="4.9" height="15.0" fill="rgb(207,226,8)" rx="2" ry="2" />
+<text  x="1050.47" y="111.5" ></text>
+</g>
+<g >
+<title>napi_unwrap (160,541,303 samples, 0.83%)</title><rect x="1076.7" y="117" width="9.8" height="15.0" fill="rgb(243,215,13)" rx="2" ry="2" />
+<text  x="1079.71" y="127.5" ></text>
+</g>
+<g >
+<title>Builtins_InterpreterEntryTrampoline (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="213" width="1174.4" height="15.0" fill="rgb(250,24,37)" rx="2" ry="2" />
+<text  x="14.96" y="223.5" >Builtins_InterpreterEntryTrampoline</text>
+</g>
+<g >
+<title>v8::internal::Object::GetProperty (120,400,872 samples, 0.63%)</title><rect x="568.5" y="69" width="7.4" height="15.0" fill="rgb(227,82,40)" rx="2" ry="2" />
+<text  x="571.51" y="79.5" ></text>
+</g>
+<g >
+<title>Builtins_InterpreterEntryTrampoline (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="197" width="1174.4" height="15.0" fill="rgb(237,210,33)" rx="2" ry="2" />
+<text  x="14.96" y="207.5" >Builtins_InterpreterEntryTrampoline</text>
+</g>
+<g >
+<title>v8::Context::FromSnapshot (58,121,987 samples, 0.30%)</title><rect x="1186.4" y="389" width="3.6" height="15.0" fill="rgb(207,198,53)" rx="2" ry="2" />
+<text  x="1189.42" y="399.5" ></text>
+</g>
+<g >
+<title>v8::internal::Map::FindRootMap (795,894,241 samples, 4.13%)</title><rect x="964.5" y="69" width="48.8" height="15.0" fill="rgb(208,45,42)" rx="2" ry="2" />
+<text  x="967.51" y="79.5" >v8::..</text>
+</g>
+<g >
+<title>v8::EscapableHandleScope::Escape (200,283,549 samples, 1.04%)</title><rect x="539.0" y="69" width="12.3" height="15.0" fill="rgb(228,45,38)" rx="2" ry="2" />
+<text  x="542.04" y="79.5" ></text>
+</g>
+<g >
+<title>v8::internal::(anonymous namespace)::Invoke (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="309" width="1174.4" height="15.0" fill="rgb(227,25,1)" rx="2" ry="2" />
+<text  x="14.96" y="319.5" >v8::internal::(anonymous namespace)::Invoke</text>
+</g>
+<g >
+<title>v8::internal::InterruptsScope::InterruptsScope (80,209,034 samples, 0.42%)</title><rect x="556.2" y="69" width="5.0" height="15.0" fill="rgb(234,103,6)" rx="2" ry="2" />
+<text  x="559.24" y="79.5" ></text>
+</g>
+<g >
+<title>v8::EscapableHandleScope::EscapableHandleScope (359,545,668 samples, 1.87%)</title><rect x="517.0" y="69" width="22.0" height="15.0" fill="rgb(251,117,5)" rx="2" ry="2" />
+<text  x="520.01" y="79.5" >v..</text>
+</g>
+<g >
+<title>v8::internal::LookupIterator::FetchValue (639,891,225 samples, 3.32%)</title><rect x="815.5" y="37" width="39.2" height="15.0" fill="rgb(236,213,50)" rx="2" ry="2" />
+<text  x="818.47" y="47.5" >v8:..</text>
+</g>
+<g >
+<title>v8impl::(anonymous namespace)::FunctionCallbackWrapper::Invoke (40,178,247 samples, 0.21%)</title><rect x="1184.0" y="149" width="2.4" height="15.0" fill="rgb(221,229,9)" rx="2" ry="2" />
+<text  x="1186.96" y="159.5" ></text>
+</g>
+<g >
+<title>v8::internal::SnapshotCompression::Decompress (58,121,987 samples, 0.30%)</title><rect x="1186.4" y="309" width="3.6" height="15.0" fill="rgb(211,84,30)" rx="2" ry="2" />
+<text  x="1189.42" y="319.5" ></text>
+</g>
+<g >
+<title>v8::internal::Execution::Call (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="325" width="1174.4" height="15.0" fill="rgb(224,44,35)" rx="2" ry="2" />
+<text  x="14.96" y="335.5" >v8::internal::Execution::Call</text>
+</g>
+<g >
+<title>v8::Locker::IsActive (80,403,033 samples, 0.42%)</title><rect x="551.3" y="69" width="4.9" height="15.0" fill="rgb(231,215,24)" rx="2" ry="2" />
+<text  x="554.31" y="79.5" ></text>
+</g>
+<g >
+<title>v8::internal::LookupIterator::GetDataValue (79,991,105 samples, 0.42%)</title><rect x="649.3" y="53" width="4.9" height="15.0" fill="rgb(238,99,15)" rx="2" ry="2" />
+<text  x="652.32" y="63.5" ></text>
+</g>
+<g >
+<title>[perf-104964.map] (18,852,833,695 samples, 97.88%)</title><rect x="31.4" y="165" width="1155.0" height="15.0" fill="rgb(227,178,23)" rx="2" ry="2" />
+<text  x="34.38" y="175.5" >[perf-104964.map]</text>
+</g>
+<g >
+<title>Builtins_CallApiCallback (18,493,647,325 samples, 96.02%)</title><rect x="50.9" y="149" width="1133.1" height="15.0" fill="rgb(242,216,23)" rx="2" ry="2" />
+<text  x="53.93" y="159.5" >Builtins_CallApiCallback</text>
+</g>
+<g >
+<title>v8::External::Value (279,703,266 samples, 1.45%)</title><rect x="305.1" y="85" width="17.1" height="15.0" fill="rgb(239,88,5)" rx="2" ry="2" />
+<text  x="308.10" y="95.5" ></text>
+</g>
+<g >
+<title>v8::internal::Snapshot::NewContextFromSnapshot (58,121,987 samples, 0.30%)</title><rect x="1186.4" y="325" width="3.6" height="15.0" fill="rgb(231,140,38)" rx="2" ry="2" />
+<text  x="1189.42" y="335.5" ></text>
+</g>
+<g >
+<title>v8::Context::GetNumberOfEmbedderDataFields (119,523,278 samples, 0.62%)</title><rect x="290.4" y="85" width="7.3" height="15.0" fill="rgb(241,64,45)" rx="2" ry="2" />
+<text  x="293.40" y="95.5" ></text>
+</g>
+<g >
+<title>v8::internal::LookupIterator::FetchValue (79,467,301 samples, 0.41%)</title><rect x="644.5" y="53" width="4.8" height="15.0" fill="rgb(238,7,23)" rx="2" ry="2" />
+<text  x="647.46" y="63.5" ></text>
+</g>
+<g >
+<title>Cr_z_inflate (58,121,987 samples, 0.30%)</title><rect x="1186.4" y="277" width="3.6" height="15.0" fill="rgb(229,25,29)" rx="2" ry="2" />
+<text  x="1189.42" y="287.5" ></text>
+</g>
+<g >
+<title>Builtins_CallApiCallback (316,947,627 samples, 1.65%)</title><rect x="12.0" y="165" width="19.4" height="15.0" fill="rgb(226,7,19)" rx="2" ry="2" />
+<text  x="14.96" y="175.5" ></text>
+</g>
+<g >
+<title>v8::internal::HeapObject::IsExternal (160,671,783 samples, 0.83%)</title><rect x="954.7" y="69" width="9.8" height="15.0" fill="rgb(211,151,20)" rx="2" ry="2" />
+<text  x="957.67" y="79.5" ></text>
+</g>
+<g >
+<title>[unknown] (31,957,001 samples, 0.17%)</title><rect x="10.0" y="453" width="2.0" height="15.0" fill="rgb(217,94,27)" rx="2" ry="2" />
+<text  x="13.00" y="463.5" ></text>
+</g>
+<g >
+<title>v8::Object::Get (77,817,573 samples, 0.40%)</title><rect x="1032.9" y="101" width="4.7" height="15.0" fill="rgb(229,127,49)" rx="2" ry="2" />
+<text  x="1035.87" y="111.5" ></text>
+</g>
+<g >
+<title>napi_get_cb_info (119,548,555 samples, 0.62%)</title><rect x="1069.4" y="117" width="7.3" height="15.0" fill="rgb(235,78,24)" rx="2" ry="2" />
+<text  x="1072.38" y="127.5" ></text>
+</g>
+<g >
+<title>_dl_cache_libcmp (31,697,883 samples, 0.16%)</title><rect x="10.0" y="437" width="2.0" height="15.0" fill="rgb(254,176,24)" rx="2" ry="2" />
+<text  x="13.02" y="447.5" ></text>
+</g>
+<g >
+<title>all (19,260,232,146 samples, 100%)</title><rect x="10.0" y="485" width="1180.0" height="15.0" fill="rgb(235,63,4)" rx="2" ry="2" />
+<text  x="13.00" y="495.5" ></text>
+</g>
+<g >
+<title>v8impl::(anonymous namespace)::FunctionCallbackWrapper::Invoke (17,934,167,436 samples, 93.12%)</title><rect x="85.2" y="133" width="1098.8" height="15.0" fill="rgb(249,103,7)" rx="2" ry="2" />
+<text  x="88.20" y="143.5" >v8impl::(anonymous namespace)::FunctionCallbackWrapper::Invoke</text>
+</g>
+<g >
+<title>v8::internal::ThreadId::GetCurrentThreadId (120,485,060 samples, 0.63%)</title><rect x="886.4" y="69" width="7.4" height="15.0" fill="rgb(228,44,42)" rx="2" ry="2" />
+<text  x="889.43" y="79.5" ></text>
+</g>
+<g >
+<title>Builtins_InterpreterEntryTrampoline (19,169,781,322 samples, 99.53%)</title><rect x="12.0" y="229" width="1174.4" height="15.0" fill="rgb(220,149,12)" rx="2" ry="2" />
+<text  x="14.96" y="239.5" >Builtins_InterpreterEntryTrampoline</text>
+</g>
+<g >
+<title>v8::External::Value (160,494,926 samples, 0.83%)</title><rect x="75.4" y="133" width="9.8" height="15.0" fill="rgb(226,133,1)" rx="2" ry="2" />
+<text  x="78.37" y="143.5" ></text>
+</g>
+<g >
+<title>node::NodeMainInstance::CreateMainEnvironment (58,121,987 samples, 0.30%)</title><rect x="1186.4" y="405" width="3.6" height="15.0" fill="rgb(240,100,21)" rx="2" ry="2" />
+<text  x="1189.42" y="415.5" ></text>
+</g>
+</g>
+</svg>
