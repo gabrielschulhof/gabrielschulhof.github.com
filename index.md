@@ -3,6 +3,11 @@
 * [JerryScript Modules](presentations/JerryScript-modules.pdf)
 * [Blog Post](./native-addons-are-close-to-being-on-par-with-js-modules.md)
 * [Talk with Kevin](https://www.youtube.com/watch?v=4cCSPw-I0GE)
+* [In Memory of Travails](./In.Memory.of.Travails.pdf)
+    * [GraphQLConf 2024](https://www.youtube.com/watch?v=eXWXRF6gYg8)
+    * [Conf42](https://www.youtube.com/watch?v=96mm86QVmtg)
+    * [JSNation US](https://gitnation.com/contents/in-memory-of-travails)
+    * API World 2024
 
 # TeXmacs patches
 <a href="https://savannah.gnu.org/patch/?func=detailitem&item_id=1009">1009</a>
